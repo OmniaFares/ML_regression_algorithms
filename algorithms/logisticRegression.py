@@ -1,8 +1,6 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-from sklearn import metrics
-from sklearn.linear_model import LogisticRegression
 
 
 data = pd.read_csv('heart.csv')
@@ -21,29 +19,21 @@ y_test = np.array(y[TrainSize:])
 
 
 theta = np.zeros(np.size(x, 1) + 1)
-alpha = 0.09
+alphaArr = [0.001,0.00005,0.0003]
 iterations = 1000
 
 
 def costfunction(theta,x,y):
     h = hypothesis(x,theta)
-    #print("h : ",h)
     predictions1 = y*np.log(h)
-    #print(np.log(h))
-    #print(predictions1)
     predictions2 = (1-y) * np.log(1-h)
-    #print(np.log(1-h))
-    #print(predictions2)
     errors = (predictions1 + predictions2)
-    #print(errors)
     J = (-1 / (y.size)) * np.sum(errors)
-    print(J)
     return J
 
 
 def hypothesis(x, theta):
     ex = np.dot(x, theta)
-    #print(ex, "jjjjjj ", np.exp(-ex))
     return 1 / (1 + np.exp(-ex))
 
 
@@ -55,9 +45,7 @@ def gradient_descent(x, y, theta, iterations, alpha):
         j = costfunction(theta, x, y)
         past_costs.append(j)
         diff = np.dot(x.T, h - y)
-       # print(diff)
         theta = theta - alpha * diff
-       # print(theta)
         past_thetas.append(theta)
 
     return theta, past_costs, past_thetas
@@ -66,24 +54,27 @@ def gradient_descent(x, y, theta, iterations, alpha):
 def predict(x, y_test, theta):
     h = hypothesis(x, theta)
     y_predict = np.where(h >= .5, 1, 0)
-    print(y_test, y_predict)
-    MSE = (1 / y.size) * np.sum(((y_predict - y_test) ** 2))
+    print("Actual Data  : ", y_test)
+    print("Predicted Data  : ", y_predict)
     acc = np.sum(np.equal(y_test, y_predict)) / len(y_predict)
-    return acc , MSE
+    return acc
 
+for alpha in alphaArr :
+    print("For Alpha = " , alpha)
+    print("------------------------------------------")
+    theta, past_costs, past_thetas = gradient_descent(x_train, y_train, theta, iterations, alpha)
+    print("Theta Values : ", theta)
 
-theta, past_costs, past_thetas = gradient_descent(x_train, y_train, theta, iterations, alpha)
-print(theta)
+    acc = predict(x_test, y_test, theta)
+    print("Accuracy = ", acc)
 
+    theta = np.zeros(np.size(x, 1) + 1)
+    plt.title('Cost Function J')
+    plt.xlabel('No. of iterations')
+    plt.ylabel('Cost')
+    plt.plot(past_costs)
+    plt.show()
+    print("------------------------------------------")
 
-acc, MSE = predict(x_test, y_test, theta)
-print("error = ", MSE)
-print("acc = ", acc)
-
-############### Testing #################
-model = LogisticRegression(random_state=0, solver='lbfgs').fit(x, y)
-model.fit(x_train,y_train)
-prediction=model.predict(x_test)
-print('The accuracy of the Logistic Regression is', metrics.accuracy_score(prediction,y_test))
 
 
