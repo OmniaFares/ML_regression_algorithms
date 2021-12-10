@@ -6,22 +6,22 @@ from sklearn.linear_model import LogisticRegression
 
 
 data = pd.read_csv('heart.csv')
-x = np.c_[data['trestbps'], data['chol'], data['thalach'], data['oldpeak']]
+x = data[['trestbps', 'chol', 'thalach', 'oldpeak']]
 y = data['target']
 x = (x - x.mean()) / (x.std())
 
-percent = int(len(x) * 0.8)
-x_train = x[:percent]
+TrainSize = int(len(x) * 0.8)
+x_train = x[:TrainSize]
 x_train = np.c_[np.ones(x_train.shape[0]), x_train]
-y_train = np.array(y[:percent])
+y_train = np.array(y[:TrainSize])
 
-x_test = x[percent:]
+x_test = x[TrainSize:]
 x_test = np.c_[np.ones(x_test.shape[0]), x_test]
-y_test = np.array(y[percent:])
+y_test = np.array(y[TrainSize:])
 
 
 theta = np.zeros(np.size(x, 1) + 1)
-alpha = 0.01
+alpha = 0.1
 iterations = 1000
 
 
