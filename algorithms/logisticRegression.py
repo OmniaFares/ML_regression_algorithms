@@ -19,7 +19,7 @@ y_test = np.array(y[TrainSize:])
 
 
 theta = np.zeros(np.size(x, 1) + 1)
-alphaArr = [0.001,0.00005,0.0003]
+alphaArr = [0.001, 0.00005, 0.0003]
 iterations = 1000
 
 

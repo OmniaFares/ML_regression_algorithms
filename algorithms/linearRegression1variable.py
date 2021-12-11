@@ -12,7 +12,7 @@ maxValue = x.max()
 
 x = (x - minValue)/(maxValue - minValue)
 
-dataSize =  (int)(0.8 * len(x))
+dataSize = int(0.8 * len(x))
 trainDataX = x[:dataSize]
 trainDataX = np.c_[np.ones(trainDataX.shape[0]), trainDataX]
 testDataX = x[dataSize:]
@@ -25,13 +25,14 @@ arrY = np.array(trainDataY).flatten()
 theta = np.array([0,0])
 
 m = len(arrY)
+iterations = 10000
+alpha = [0.35, 0.1, 0.08]
+
 
 def cost_function(x,y,theta,m):
     j = np.sum((x.dot(theta) - y) **2)/(2*m)
     return j
 
-iterations = 10000
-alpha = 0.35
 
 def gradient_descent(x,y,theta,alpha,iterations,m):
     history = [0] * iterations
@@ -45,25 +46,42 @@ def gradient_descent(x,y,theta,alpha,iterations,m):
         history[iter] = cost
     return theta,history
 
-(t,h) = gradient_descent(arrX,arrY,theta,alpha,iterations,m)
-print(cost_function(testDataX,testDataY,t,len(testDataX)))
+
+def predict(xs, ys, thetas):
+    y_predict = np.dot(xs, thetas)
+    div = np.subtract(ys, y_predict)
+    MSE = np.dot(div.T, div) / len(xs)
+    return MSE
+
+for a in range(len(alpha)):
+    print('###############################################################################################')
+    print('with alpha =', alpha[a])
+    (t, costHis) = gradient_descent(arrX, arrY, theta, alpha[a], iterations, m)
+
+    for i in range(len(t)):
+        print('\ttheta', i, '= ', t[i])
+
+    total_error = predict(testDataX, testDataY, t)
+    print('\n\terror for test data = ', total_error)
+
+    plt.title(label= ('Cost Function J with alpha = ', alpha[a]))
+    plt.xlabel('No. of iterations')
+    plt.ylabel('Cost')
+    plt.plot(costHis)
+    plt.show()
+
+    fitX = np.linspace(0, 1, 2)
+    fitY = [t[0] + t[1] * xx for xx in fitX]
+    plt.title(('Living VS price (alpha = ', alpha[a], ')'))
+    plt.xlabel('Living Area sqft (normalised)')
+    plt.ylabel('Sale Price ($)')
+    plt.scatter(testDataX[:, 1], testDataY)
+    plt.plot(fitX, fitY, color='red')
+    plt.show()
 
 
-#34012848737.6167
-#34012848737.616318
-plt.title('Cost Function J')
-plt.xlabel('No. of iterations')
-plt.ylabel('Cost')
-plt.plot(h)
-plt.show()
 
-fitX = np.linspace(0,1,2)
-fitY = [t[0] + t[1]*xx for xx in fitX]
-plt.title('Living VS price')
-plt.xlabel('Living Area sqft (normalised)')
-plt.ylabel('Sale Price ($)')
-plt.scatter(testDataX[:, 1],testDataY)
-plt.plot(fitX,fitY, color='red')
-plt.show()
+
+
 
 
